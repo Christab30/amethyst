@@ -20,7 +20,6 @@
  */
 package com.vitorpamplona.amethyst.service.lang
 
-import android.content.Context
 import android.os.Build
 import android.os.CancellationSignal
 import android.view.textclassifier.TextClassificationManager
@@ -95,7 +94,7 @@ object LanguageTranslatorService {
 
         val bestLocale = result.getLocale(0)
         if (result.getConfidenceScore(bestLocale) < MIN_LANGUAGE_CONFIDENCE) return null
-        return bestLocale.toLanguageTag()
+        return bestLocale.language
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -108,6 +107,9 @@ object LanguageTranslatorService {
             Amethyst.instance.appContext.getSystemService(TranslationManager::class.java)
                 ?: throw OnDeviceTranslationUnavailableException()
 
+        // Strictly use models Android reports as already installed. We intentionally do not create
+        // a translator for STATE_AVAILABLE_TO_DOWNLOAD so viewing a note cannot trigger a model
+        // download or network activity behind the user's back.
         val capability =
             manager
                 .getOnDeviceTranslationCapabilities(
@@ -167,17 +169,17 @@ object LanguageTranslatorService {
                         mutableListOf(TranslationRequestValue.forText(text)),
                     ).build()
 
-            translator.translate(request, cancellationSignal, executorService) { response ->
-                if (!continuation.isActive) return@translate
+            translator.translate(request, cancellationSignal, executorService) responseCallback@{ response ->
+                if (!continuation.isActive) return@responseCallback
                 if (response.translationStatus != TranslationResponse.TRANSLATION_STATUS_SUCCESS) {
                     continuation.resume(null)
-                    return@translate
+                    return@responseCallback
                 }
 
                 val value = response.translationResponseValues.get(0)
                 if (value == null || value.statusCode != TranslationResponseValue.STATUS_SUCCESS) {
                     continuation.resume(null)
-                    return@translate
+                    return@responseCallback
                 }
 
                 continuation.resume(value.text?.toString())
