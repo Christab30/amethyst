@@ -42,30 +42,50 @@ fun TranslatableRichTextViewer(
     id: String,
     callbackUri: String? = null,
     authorPubKey: String? = null,
+    allowCompanionTranslation: Boolean = true,
     accountViewModel: AccountViewModel,
     nav: INav,
-) = ExpandableRichTextViewer(
-    content,
-    canPreview,
-    quotesLeft,
-    modifier,
-    tags,
-    backgroundColor,
-    id,
-    callbackUri,
-    authorPubKey,
-    accountViewModel,
-    nav,
-)
+) {
+    TranslatableRichTextViewer(
+        content = content,
+        id = id,
+        allowCompanionTranslation = allowCompanionTranslation,
+        accountViewModel = accountViewModel,
+    ) {
+        ExpandableRichTextViewer(
+            it,
+            canPreview,
+            quotesLeft,
+            modifier,
+            tags,
+            backgroundColor,
+            id,
+            callbackUri,
+            authorPubKey,
+            accountViewModel,
+            nav,
+        )
+    }
+}
 
 @Composable
 fun TranslatableRichTextViewer(
     content: String,
     id: String,
     translationMessageModifier: Modifier = MaxWidthPaddingTop5dp,
+    allowCompanionTranslation: Boolean = true,
     accountViewModel: AccountViewModel,
     displayText: @Composable (String) -> Unit,
-) = displayText(content)
+) {
+    // F-Droid's future companion-app backend must honor this privacy gate. Until the licensed
+    // IPC contract is available, this flavor keeps displaying the original content only.
+    if (!allowCompanionTranslation) {
+        displayText(content)
+        return
+    }
+
+    displayText(content)
+}
 
 /** No translation service in this flavor, so the content is always its own "translation". */
 @Composable
