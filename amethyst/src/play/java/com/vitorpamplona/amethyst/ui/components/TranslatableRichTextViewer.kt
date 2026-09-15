@@ -57,12 +57,14 @@ fun TranslatableRichTextViewer(
     id: String,
     callbackUri: String? = null,
     authorPubKey: String? = null,
+    allowCompanionTranslation: Boolean = true,
     accountViewModel: AccountViewModel,
     nav: INav,
 ) {
     TranslatableRichTextViewer(
         content = content,
         id = id,
+        allowCompanionTranslation = allowCompanionTranslation,
         accountViewModel = accountViewModel,
     ) {
         ExpandableRichTextViewer(
@@ -86,9 +88,15 @@ fun TranslatableRichTextViewer(
     content: String,
     id: String,
     translationMessageModifier: Modifier = MaxWidthPaddingTop5dp,
+    allowCompanionTranslation: Boolean = true,
     accountViewModel: AccountViewModel,
     displayText: @Composable (String) -> Unit,
 ) {
+    // The Play flavor translates in-process with ML Kit. The companion-app privacy gate is kept
+    // in the shared call signature so F-Droid can refuse IPC for sensitive plaintext.
+    @Suppress("UNUSED_VARIABLE")
+    val companionTranslationAllowed = allowCompanionTranslation
+
     val languages = accountViewModel.account.settings.syncedSettings.languages
     val translateTo by languages.translateTo.collectAsStateWithLifecycle()
     val dontTranslateFrom by languages.dontTranslateFrom.collectAsStateWithLifecycle()
