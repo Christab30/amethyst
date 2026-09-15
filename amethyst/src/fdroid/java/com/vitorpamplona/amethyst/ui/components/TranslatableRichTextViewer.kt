@@ -42,15 +42,15 @@ fun TranslatableRichTextViewer(
     id: String,
     callbackUri: String? = null,
     authorPubKey: String? = null,
-    allowCompanionTranslation: Boolean = true,
     accountViewModel: AccountViewModel,
     nav: INav,
+    allowCompanionTranslation: Boolean = true,
 ) {
     TranslatableRichTextViewer(
         content = content,
         id = id,
-        allowCompanionTranslation = allowCompanionTranslation,
         accountViewModel = accountViewModel,
+        allowCompanionTranslation = allowCompanionTranslation,
     ) {
         ExpandableRichTextViewer(
             it,
@@ -73,8 +73,8 @@ fun TranslatableRichTextViewer(
     content: String,
     id: String,
     translationMessageModifier: Modifier = MaxWidthPaddingTop5dp,
-    allowCompanionTranslation: Boolean = true,
     accountViewModel: AccountViewModel,
+    allowCompanionTranslation: Boolean = true,
     displayText: @Composable (String) -> Unit,
 ) {
     // F-Droid's future companion-app backend must honor this privacy gate. Until the licensed
