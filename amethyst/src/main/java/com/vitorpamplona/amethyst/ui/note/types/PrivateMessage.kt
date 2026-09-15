@@ -117,6 +117,7 @@ fun RenderPrivateMessage(
                         backgroundColor = backgroundColor,
                         id = note.idHex,
                         callbackUri = callbackUri,
+                        allowCompanionTranslation = false,
                         accountViewModel = accountViewModel,
                         nav = nav,
                     )
@@ -143,6 +144,7 @@ fun RenderPrivateMessage(
             backgroundColor = backgroundColor,
             id = note.idHex,
             callbackUri = note.toNostrUri(),
+            allowCompanionTranslation = false,
             accountViewModel = accountViewModel,
             nav = nav,
         )
